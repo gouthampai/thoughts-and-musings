@@ -45,7 +45,7 @@ const config: SiteConfig = {
     },
     {
       name: 'GitHub',
-      url: 'https://github.com/gouthampai/thoughts-and-musings',
+      url: 'https://github.com/gouthampai',
       external: true,
     },
   ],
