@@ -1,4 +1,6 @@
 ---
+import { base } from '~/site.config'
+
 interface Props {
   title?: string
   titlePieces?: string[]
@@ -6,7 +8,13 @@ interface Props {
 
 const { title, titlePieces } = Astro.props
 
-const splitPath: string[] = Astro.url.pathname
+// Remove the base path from the pathname before splitting
+let pathname = Astro.url.pathname
+if (base && pathname.startsWith(base)) {
+  pathname = pathname.slice(base.length)
+}
+
+const splitPath: string[] = pathname
   .split('/')
   .filter(Boolean) // Remove empty parts
   .map((part) => decodeURIComponent(part)) // For Unicode chars kept by github-slugger
