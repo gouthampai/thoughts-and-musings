@@ -1,6 +1,6 @@
 ---
 title: "Part 1 - Get a .NET 10 Service Running in a Docker Container Locally"
-published: 2025-12-01
+published: 2025-11-29
 draft: false
 description: 'A step by step guide on how to get a .NET 10 service running in a container locally'
 series: '.NET 10 on Azure Container Apps'
