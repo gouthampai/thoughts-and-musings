@@ -19,7 +19,7 @@ if (home.length > 0) {
   const { Content } = await render(homeEntry)
   HomeContent = Content
   homeAvatarImage = homeEntry.data.avatarImage
-  homeGithubCalendar = homeEntry.data.githubCalendar
+  //homeGithubCalendar = homeEntry.data.githubCalendar
 }
 const sortedPosts = await getSortedPosts()
 const postsHaveTags = sortedPosts.some(
@@ -37,22 +37,14 @@ const postsHaveSeries = sortedPosts.some((post) => post.data.series)
       </HomeBanner>
     )
   }
-  {
-    postsHaveSeries && (
-      <section>
-        <BlockHeader>Series</BlockHeader>
-        <SeriesSection posts={sortedPosts} />
-      </section>
-    )
-  }
-  {
+  <!-- {
     postsHaveTags && (
       <section>
         <BlockHeader>Tags</BlockHeader>
         <TagsSection posts={sortedPosts} />
       </section>
     )
-  }
+  } -->
   {
     sortedPosts.length > 0 && (
       <section>
@@ -67,6 +59,14 @@ const postsHaveSeries = sortedPosts.some((post) => post.data.series)
       </section>
     )
   }
+  <!-- {
+    postsHaveSeries && (
+      <section>
+        <BlockHeader>Series</BlockHeader>
+        <SeriesSection posts={sortedPosts} />
+      </section>
+    )
+  } -->
 </Layout>
 
 <style is:global>

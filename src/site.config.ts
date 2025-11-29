@@ -65,7 +65,7 @@ const config: SiteConfig = {
       // 'andromeeda',
       // 'aurora-x',
       // 'ayu-dark',
-      // 'catppuccin-frappe',
+       //'catppuccin-frappe',
       // 'catppuccin-latte',
       // 'catppuccin-macchiato',
       // 'catppuccin-mocha',
@@ -119,9 +119,9 @@ const config: SiteConfig = {
       // 'synthwave-84',
       // 'tokyo-night',
       // 'vesper',
-      // 'vitesse-dark',
+      //'vitesse-dark',
       'vitesse-light',
-      'vitesse-black',
+      //'vitesse-black',
     ],
     // Optional overrides for specific themes to customize colors.
     // Their values can be either a literal color (hex, rgb, hsl) or another theme key.
