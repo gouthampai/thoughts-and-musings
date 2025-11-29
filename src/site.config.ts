@@ -2,7 +2,7 @@ import type { SiteConfig } from '~/types'
 
 const config: SiteConfig = {
   // Absolute URL to the root of your published site, used for generating links and sitemaps.
-  site: 'https://gouthampai.github.io/thoughts-and-musings/',
+  site: 'https://gouthampai.github.io/thoughts-and-musings',
   // The name of your site, used in the title and for SEO.
   title: 'Thoughts and Musings',
   // The description of your site, used for SEO and RSS feed.
@@ -32,10 +32,10 @@ const config: SiteConfig = {
       name: 'Home',
       url: '/',
     },
-    {
-      name: 'About',
-      url: '/about',
-    },
+    // {
+    //   name: 'About',
+    //   url: '/about',
+    // },
     {
       name: 'Archive',
       url: '/posts',
@@ -52,7 +52,7 @@ const config: SiteConfig = {
     mode: 'select',
     // The default theme identifier, used when themeMode is "select" or "light-dark-auto".
     // Make sure this is one of the themes listed in `themes` or "auto" for "light-dark-auto" mode.
-    default: 'catppuccin-mocha',
+    default: 'vitesse-light',
     // Shiki themes to bundle with the site.
     // https://expressive-code.com/guides/themes/#using-bundled-themes
     // These will be used to theme the entire site along with syntax highlighting.
