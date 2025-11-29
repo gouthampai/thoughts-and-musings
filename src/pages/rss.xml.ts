@@ -1,5 +1,5 @@
 import rss from '@astrojs/rss'
-import siteConfig from '~/site.config'
+import siteConfig, { base } from '~/site.config'
 import type { AstroGlobal } from 'astro'
 import { getSortedPosts } from '~/utils'
 import sanitizeHtml from 'sanitize-html'
@@ -16,7 +16,7 @@ export async function GET(_context: AstroGlobal) {
   }
   const posts = await getSortedPosts()
   return rss({
-    stylesheet: '/rss.xsl',
+    stylesheet: `${base}/rss.xsl`,
     title: siteConfig.title,
     description: siteConfig.description,
     site: siteConfig.site,
@@ -25,7 +25,7 @@ export async function GET(_context: AstroGlobal) {
       pubDate: post.data.published,
       description: post.data.description,
       author: post.data.author || siteConfig.author,
-      link: `/posts/${post.id}`,
+      link: `${base}/posts/${post.id}`,
       content: sanitizeHtml(parser.render(post.body || ''), {
         allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
       }),

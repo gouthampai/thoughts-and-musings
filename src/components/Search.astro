@@ -2,11 +2,12 @@
 import '@pagefind/default-ui/css/ui.css'
 import IconCircleX from '~/icons/circle-x.svg'
 import IconSearch from '~/icons/search.svg'
+import { base } from '~/site.config'
 
 const { trailingSlashes = false } = Astro.props
 ---
 
-<site-search class="ms-auto" id="search" data-trailing-slashes={trailingSlashes}>
+<site-search class="ms-auto" id="search" data-trailing-slashes={trailingSlashes} data-base-url={base}>
   <button
     class="hover:text-accent flex cursor-pointer items-center justify-center rounded-md"
     aria-keyshortcuts="Control+K Meta+K"
@@ -88,6 +89,7 @@ const { trailingSlashes = false } = Astro.props
     #openBtn: HTMLButtonElement | null
     #controller: AbortController
     trailingSlashes: boolean
+    baseUrl: string
     stripTrailingSlash: (path: string) => string
     formatURL: (path: string) => string
 
@@ -100,6 +102,7 @@ const { trailingSlashes = false } = Astro.props
       this.#controller = new AbortController()
 
       this.trailingSlashes = this.dataset.trailingSlashes === 'true' ? true : false
+      this.baseUrl = this.dataset.baseUrl || ''
       this.stripTrailingSlash = (path: string) => path.replace(/(.)\/(#.*)?$/, '$1$2')
       this.formatURL = !this.trailingSlashes
         ? this.stripTrailingSlash
@@ -136,8 +139,8 @@ const { trailingSlashes = false } = Astro.props
         const { PagefindUI } = await import('@pagefind/default-ui')
 
         new PagefindUI({
-          baseUrl: import.meta.env.BASE_URL,
-          bundlePath: import.meta.env.BASE_URL.replace(/\/$/, '') + '/pagefind/',
+          baseUrl: this.baseUrl,
+          bundlePath: (this.baseUrl || '/').replace(/\/$/, '') + '/pagefind/',
           element: '#pagefind-search',
           showImages: false,
           showSubResults: true,

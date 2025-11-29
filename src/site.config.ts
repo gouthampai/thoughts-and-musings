@@ -1,8 +1,11 @@
 import type { SiteConfig } from '~/types'
 
+// Use environment variable for site URL, fallback to production URL
+const siteUrl = import.meta.env.SITE_URL || 'https://gouthampai.github.io/thoughts-and-musings'
+
 const config: SiteConfig = {
   // Absolute URL to the root of your published site, used for generating links and sitemaps.
-  site: 'https://gouthampai.github.io/thoughts-and-musings',
+  site: siteUrl,
   // The name of your site, used in the title and for SEO.
   title: 'Thoughts and Musings',
   // The description of your site, used for SEO and RSS feed.
@@ -180,5 +183,10 @@ const config: SiteConfig = {
     duck: '/duck.webp',
   },
 }
+
+// Derived base path from the site URL
+// If the pathname is just '/', we want an empty string so we don't get double slashes
+const pathname = new URL(siteUrl).pathname
+export const base = pathname === '/' ? '' : pathname.replace(/\/$/, '')
 
 export default config
