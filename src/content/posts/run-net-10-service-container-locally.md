@@ -10,16 +10,16 @@ tags: ['dotnet', 'azure', 'containers']
 At the time of writing, .NET 10 has just been recently released. I've been looking for an opportunity to learn more about the container offerings in Azure and .NET 10. So, let's do both and get something simple deploying to a Container App. After all, how hard can it be?
 
 ### Prerequisites
-Before we start diving into the code, we will need some tools setup first to make the next steps go smoothly.
-We'll need to install the .NET 10 SDK on your development machine from the Microsoft .NET downloads page [here](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)
+Before you start diving into the code, you will need some tools setup first to make the next steps go smoothly.
+You'll need to install the .NET 10 SDK on your development machine from the Microsoft .NET downloads page [here](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)
 
 Since we will be using Azure and Github for this project, we will also require accounts on both services.
 
 I would also suggest installing Docker Desktop or Rancher so you can run your api server container locally before deploying things to Azure.
 
-I setup the required infrastructure in Azure using Terraform. If that scares you, you may choose to create the needed services manually through the Azure Portal. Further in this post, I will share the main.tf file I used to set things up, perhaps it will be helpful to you.
+I set up the required infrastructure in Azure using Terraform. If that scares you, you may choose to create the needed services manually through the Azure Portal. Further in this post, I will share the main.tf file I used to set things up, perhaps it will be helpful to you.
 
-The last thing we may want is a tool like Postman or Insomnia to be able to make requests to our new API endpoints. If you are a badass who uses cURL to do that, you can skip installing such a tool on your machine.
+The last thing you may want is a tool like Postman or Insomnia to be able to make requests to your new API endpoints. If you are a badass who uses cURL to do that, you can skip installing such a tool on your machine.
 
 ### Generating a new .NET 10 API
 Let's go ahead and create a new .NET project using the below command.
@@ -81,7 +81,7 @@ internal partial class AppJsonSerializerContext : JsonSerializerContext
 }
 ```
 
-Let's check out the configured open api endpoint. Take a look at the generated launchsettings.json file and you should be able to tell what url your api server will get served on locally. Mine was configured to `http://localhost:5144`. Yours might be different. Run `dotnet run` in the directory of your newly generated csproj file and go to `<your_startup_url>/openapi/v1.json`. We can now see a open api spec defined for the two minimal api endpoints we saw before in `Program.cs`. Using a tool like Postman, you can also make calls to `<your_startup_url>/todos` and you should get a response back with a list of todo items. If you don't, your dotnet development server might not be running. 
+Let's check out the configured open api endpoint. Take a look at the generated launchsettings.json file and you should be able to tell what URL your API server will get served on locally. Mine was configured to `http://localhost:5144`. Yours might be different. Run `dotnet run` in the directory of your newly generated csproj file and go to `<your_startup_url>/openapi/v1.json`. We can now see an OpenAPI spec defined for the two minimal api endpoints we saw before in `Program.cs`. Using a tool like Postman, you can also make calls to `<your_startup_url>/todos` and you should get a response back with a list of todo items. If you don't, your dotnet development server might not be running. 
 
 ### Docker Time!
 Add a new Dockerfile at the root of the repository where your new api folder is. Please note that Dockerfile has no extension. Mine ended up being placed just one folder up from where the new csproj file is.
@@ -131,7 +131,7 @@ At a high level, this is what the above Dockerfile instructs the build tool to d
 1. Using the dotnet 10 sdk image from microsoft as a basis, copy and build the .NET 10 project as a self-contained application
 2. Using the slimmed down runtime-deps image, listen on port 8080 after running the built project code
 
-While getting this running on my personal M2 Macbook Pro, I did run into a couple minor snags around the supported os/processor architectures that Docker thinks I want it to use. I needed to build the Dockerfile in such a way that it would be able to support both x64 and arm64 systems. To make this work, I had to add a RuntimeIdentifiers value to my csproj file as shown below and then run both `dotnet clean` and `dotnet build`. This generated the correct the right project.assets.json file. 
+While getting this running on my personal M2 MacBook Pro, I did run into a couple minor snags around the supported os/processor architectures that Docker thinks I want it to use. I needed to build the Dockerfile in such a way that it would be able to support both x64 and arm64 systems. To make this work, I had to add a RuntimeIdentifiers value to my csproj file as shown below and then run both `dotnet clean` and `dotnet build`. This generated the correct project.assets.json file. 
 
 ```xml
 <PropertyGroup>
