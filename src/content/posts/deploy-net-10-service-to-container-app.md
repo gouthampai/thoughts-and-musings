@@ -7,7 +7,7 @@ series: '.NET 10 on Azure Container Apps'
 tags: ['dotnet', 'azure', 'containers']
 ---
 
-Welcome to part two of my series on working with .NET 10 and containers. I will be picking up where we left off last time. Last time, we spun up a new .NET 10 web api and got it building as a docker image locally. This time, I'll be focusing on setting up the infrastructure in Azure and wiring up Github Actions to deploy to Azure. 
+Welcome to part two of my series on working with .NET 10 and containers. I will be picking up where we left off last time. Last time, we spun up a new .NET 10 Web API and got it building as a docker image locally. This time, I'll be focusing on setting up the infrastructure in Azure and wiring up Github Actions to deploy to Azure. 
 
 ### Setting up your Container App
 Before we can deploy our code to Azure, we need to create the required resources. We will need to create a new Container App (CA) and an accompanying Container Apps Environment (CAE) resource.
@@ -15,10 +15,10 @@ The CA represents a single service we might want to deploy while the CAE represe
 
 For example, you might have one service to serve up a UI and another one to perform server side processing of data. These two services would separately run and scale on their own respective CAs while being associated to the same CAE. In an enterprise scenario, you might choose to have your non-prod services associated with one CAE and your production services associated with a different CAE. 
 
-I created my infrastructure using something similar to the terraform code [here](https://github.com/gouthampai/terraform-samples/tree/main/net-10-container-app-sample). You just need to copy what's there and provide the respective values in a tfvars file of your choice. After that, running `terraform apply -var-file="your-vars.tfvars" should create the needed infrastructure in Azure.
+I created my infrastructure using something similar to the terraform code [here](https://github.com/gouthampai/terraform-samples/tree/main/net-10-container-app-sample). You just need to copy what's there and provide the respective values in a tfvars file of your choice. After that, running `terraform apply -var-file="your-vars.tfvars"` should create the needed infrastructure in Azure.
 
 :::tip
-To create container apps in Azure, you must have the registration enabled for the `Microsoft.App` resource provider in the Azure subscription. You can locate this setting by navigating to your Subscription resource in Azure and clicking on Resource Providers under the Settings drop down tab on the left hand side. Then, search for `Microsoft.App` in the "Filter by name" search box and click the necessary prompts to enable the registration.
+To create container apps in Azure, you must have the registration enabled for the `Microsoft.App` resource provider in the Azure subscription. You can locate this setting by navigating to your Subscription resource in Azure and clicking on Resource Providers under the Settings drop down tab on the left hand side. Then, search for `Microsoft.App` in the "Filter by name" search box and click "Register" to enable the resource provider.
 :::
 
 ### Deploying to Azure using Github Actions
@@ -106,7 +106,7 @@ jobs:
       uses: azure/container-apps-deploy-action@v1
       with:
         containerAppName: ${{ vars.AZURE_CONTAINER_APP_NAME }}
-        containerAppEnvironment: ${{vars.AZURE_APP_ENV_NAME}}
+        containerAppEnvironment: ${{ vars.AZURE_APP_ENV_NAME }}
         resourceGroup: ${{ secrets.AZURE_RESOURCE_GROUP }}
         imageToDeploy: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}-${{ needs.build-and-push.outputs.short_sha }}
         registryUrl: ${{ env.REGISTRY }}
@@ -114,9 +114,9 @@ jobs:
         registryPassword: ${{ secrets.PACKAGE_ACCESS_TOKEN }}
 ```
 
- For the most part, this is a pretty standard workflow file so I won't go over every details, just the important ones that should be called out. In the permissions section, we are granting write permissions for id-token and read for contents. This allows the workflow to read the contents of the github repository and to exchange the GITHUB_TOKEN value for a OpenID Connect (OIDC) token from your Entra Id App Registration. If this sounds like black magic, please take a look at the "Github - Azure OIDC Token Exchange" section for a simplified explanation of how it works. 
+ For the most part, this is a pretty standard workflow file so I won't go over every detail, just the important ones that should be called out. In the permissions section, we are granting write permissions for id-token and read for contents. This allows the workflow to read the contents of the github repository and to exchange the GITHUB_TOKEN value for a OpenID Connect (OIDC) token from your Entra Id App Registration. If this sounds like black magic, please take a look at the "Github - Azure OIDC Token Exchange" section for a simplified explanation of how it works.
 
- Other than that, the workflow the split into two jobs. One to build and push the docker image to the Github Container Registry and another to perform the deployment of the newly built image to the azure container app. Don't worry about what the values for all the environment variables and secrets need to be just yet. I'll be covering that in just a sec.
+ Other than that, the workflow is split into two jobs. One to build and push the docker image to the Github Container Registry and another to perform the deployment of the newly built image to the azure container app. Don't worry about what the values for all the environment variables and secrets need to be just yet. I'll be covering that in just a sec.
 
 #### Github - Azure OIDC Token Exchange
 You can picture this interaction as similar to passport control at the airport. The officer will check your documents and stamp your passport if they deem you should have access to their country. At a later point during your trip, you can show the stamp in your passport as proof of legal presence.
@@ -169,7 +169,7 @@ In the azure side you will need to do the following:
 7. Click on the Federated Credentials tab and click the button to add a new credential
 8. In the scenario dropdown, choose "Github Actions deploying Azure resources". You will now see some fields you have to fill out.
 9. If you're using github for personal development, the organization name will be the name of your github account. (for me, this was gouthampai)
-10. Fill in the name of your repository and the name of the environment that will be correspond to the azure deployment. If you will be using this to deploy to more than one environment in azure, you might prefer to link it deployments with a specific branch or tag. I opted to use the environment set as "production" in github.
+10. Fill in the name of your repository and the name of the environment that will correspond to the azure deployment. If you will be using this to deploy to more than one environment in azure, you might prefer to link it deployments with a specific branch or tag. I opted to use the environment set as "production" in github.
 11. Give the credential a name and finish things up.
 12. The last thing you'll need to do is to grant the service principal access to deploy to your new container app. In the azure portal, navigate to the container app you created and click on Access Control (IAM).
 13. You'll want to grant the role of Container Apps Contributor to the service principal you just created.
@@ -184,7 +184,7 @@ Here we are going to create a github PAT so that our container app can pull down
 
 Next, navigate to your repository and go to Settings
 1. Click on Environments in the side bar and add a new environment called "production".
-2. Check the box under Required Reviewers and add yourself. This will make it so you have to approve each deployment.
+2. Enable "Required reviewers" and add yourself as a reviewer. This will make it so you have to approve each deployment.
 3. Next we will add some environment variables
     - AZURE_APP_ENV_NAME - the name of the container app environment you created earlier
     - AZURE_CONTAINER_APP_NAME - the name of the container app you created earlier
@@ -197,7 +197,7 @@ Next, navigate to your repository and go to Settings
     - PACKAGE_ACCESS_TOKEN - the PAT you created before with packages:read access
 
 ### Time to deploy!
-Assuming you have set everything up correctly, you should be able to kick off a workflow in your github repository and see it successfully deploy to your new container app. Let's test if your newly deployed container app web api works! In Postman, make a http request to your container app. If you need to, grab the url for your container app from Azure. It should be something ending in `azurecontainerapps.io`. Make a request to `<your container app url>/todos/1` and you should get back some JSON as you did before when running the service locally. Congrats! You have successfully deployed a .NET 10 Web API to an Azure Container App!
+Assuming you have set everything up correctly, you should be able to kick off a workflow in your github repository and see it successfully deploy to your new container app. Let's test if your newly deployed container app Web API works! In Postman, make a GET request to your container app. If you need to, grab the url for your container app from Azure. It should be something ending in `azurecontainerapps.io`. Make a GET request to `<your container app url>/todos/1` and you should get back some JSON as you did before when running the service locally. Congrats! You have successfully deployed a .NET 10 Web API to an Azure Container App!
 
 #### Sources
 [Deploy to Azure Container Apps with Github Actions](https://learn.microsoft.com/en-us/azure/container-apps/github-actions)
