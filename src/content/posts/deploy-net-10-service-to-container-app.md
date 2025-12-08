@@ -105,8 +105,8 @@ jobs:
     - name: Deploy to Azure Container Apps
       uses: azure/container-apps-deploy-action@v1
       with:
-        containerAppName: ${{ secrets.AZURE_CONTAINER_APP_NAME }}
-        containerAppEnvironment: ${{secrets.AZURE_APP_ENV_NAME}}
+        containerAppName: ${{ vars.AZURE_CONTAINER_APP_NAME }}
+        containerAppEnvironment: ${{vars.AZURE_APP_ENV_NAME}}
         resourceGroup: ${{ secrets.AZURE_RESOURCE_GROUP }}
         imageToDeploy: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}-${{ needs.build-and-push.outputs.short_sha }}
         registryUrl: ${{ env.REGISTRY }}
@@ -114,46 +114,92 @@ jobs:
         registryPassword: ${{ secrets.PACKAGE_ACCESS_TOKEN }}
 ```
 
-Let's break down what each part does.
-```yml
-name: Build and Deploy to Azure Container Apps
+ For the most part, this is a pretty standard workflow file so I won't go over every details, just the important ones that should be called out. In the permissions section, we are granting write permissions for id-token and read for contents. This allows the workflow to read the contents of the github repository and to exchange the GITHUB_TOKEN value for a OpenID Connect (OIDC) token from your Entra Id App Registration. If this sounds like black magic, please take a look at the "Github - Azure OIDC Token Exchange" section for a simplified explanation of how it works. 
 
-on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
+ Other than that, the workflow the split into two jobs. One to build and push the docker image to the Github Container Registry and another to perform the deployment of the newly built image to the azure container app. Don't worry about what the values for all the environment variables and secrets need to be just yet. I'll be covering that in just a sec.
 
-permissions:
-  id-token: write
-  contents: read
+#### Github - Azure OIDC Token Exchange
+You can picture this interaction as similar to passport control at the airport. The officer will check your documents and stamp your passport if they deem you should have access to their country. At a later point during your trip, you can show the stamp in your passport as proof of legal presence.
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
-```
-The first part before we get to the jobs section specifies the name of the workflow, the conditions under which it runs, the permissions that GITHUB_TOKEN gets in this workflow and some env variables to be used during the course of the workflow run. This workflow is setup to trigger on pushes to main and on manual workflow triggers from Github. Moving onto the permissions section, we are granting write permissions for id-token and read for contents. This allows the workflow to read the contents of the github repository and to exchange the GITHUB_TOKEN value for a OpenID Connect (OIDC) token from your Entra Id App Registration.
-
-#### How it works
+**Initial Token Exchange**
 :::github{align="right"}
-Hi, I want a token to deploy a docker image to container app abc.
+Hi, I want to get access to deploy to container app abc.
 :::
 
 :::azure{align="left"}
-Who says you can deploy things to container app abc?
+Who are you?
 :::
 
 :::github{align="right"}
-Check the list, it says xyz repo in github can deploy to container app abc.
+Here is my ID token from github that says I am from repository xyz.
 :::
 
 :::azure{align="left"}
-Sure does. Can you prove you're from github repo xyz?
+Hmm... okay. Here's your Azure access token that says you can deploy for the next 10 minutes.
+:::
+
+**A couple seconds later**
+
+:::github{align="right"}
+Hi, I want to deploy a new image to container app abc.
+:::
+
+:::azure{align="left"}
+Do you have access?
 :::
 
 :::github{align="right"}
-Here is my Github OIDC token. Take a look!
+Here is my access token from azure that says I can.
 :::
 
 :::azure{align="left"}
-Hmm... okay. Here's your Azure token that will let you deploy. Have a nice day!
+Okay, I will allow this deployment to container app abc.
 :::
+
+#### How to set it up
+##### Azure
+In the azure side you will need to do the following:
+
+1. Navigate to the Microsoft Entra Id home page at [https://entra.microsoft.com](https://entra.microsoft.com)
+2. Click on App Registrations on the left hand side menu
+3. Click on "+ New Registration"
+4. Name your new registration something readable like "Container App .NET 10 Service Deployment User" and click Register
+5. On the next page, note the client id and tenant id. You will need these later in Github.
+6. Click on Certificates and Secrets on the left hand side menu
+7. Click on the Federated Credentials tab and click the button to add a new credential
+8. In the scenario dropdown, choose "Github Actions deploying Azure resources". You will now see some fields you have to fill out.
+9. If you're using github for personal development, the organization name will be the name of your github account. (for me, this was gouthampai)
+10. Fill in the name of your repository and the name of the environment that will be correspond to the azure deployment. If you will be using this to deploy to more than one environment in azure, you might prefer to link it deployments with a specific branch or tag. I opted to use the environment set as "production" in github.
+11. Give the credential a name and finish things up.
+12. The last thing you'll need to do is to grant the service principal access to deploy to your new container app. In the azure portal, navigate to the container app you created and click on Access Control (IAM).
+13. You'll want to grant the role of Container Apps Contributor to the service principal you just created.
+
+##### Github
+In Github, we are first going to go to Profile > Settings > Developer Settings > Personal Access Tokens > Tokens (classic).
+Here we are going to create a github PAT so that our container app can pull down the image we deploy to it when it needs to scale up the number of replicas. 
+1. Add a new PAT, give it a readable name like "container apps image pull access token"
+2. Under Scopes, all it needs to have access to is read:packages.
+3. Generate the token value and record it someplace safe. We will need it very soon.
+4. Put a reminder in your calendar to rotate the token secret a few days before expiry 🙂
+
+Next, navigate to your repository and go to Settings
+1. Click on Environments in the side bar and add a new environment called "production".
+2. Check the box under Required Reviewers and add yourself. This will make it so you have to approve each deployment.
+3. Next we will add some environment variables
+    - AZURE_APP_ENV_NAME - the name of the container app environment you created earlier
+    - AZURE_CONTAINER_APP_NAME - the name of the container app you created earlier
+    - AZURE_RESOURCE_GROUP - the name of the resource group your container app belongs to
+    
+4. Right now, we will also add a few secrets
+    - AZURE_CLIENT_ID - the client id you copied down before
+    - AZURE_SUBSCRIPTION_ID - the subscription id of your azure subscription
+    - AZURE_TENANT_ID - the tenant id you copied down before while creating the app registration
+    - PACKAGE_ACCESS_TOKEN - the PAT you created before with packages:read access
+
+### Time to deploy!
+Assuming you have set everything up correctly, you should be able to kick off a workflow in your github repository and see it successfully deploy to your new container app. Let's test if your newly deployed container app web api works! In Postman, make a http request to your container app. If you need to, grab the url for your container app from Azure. It should be something ending in `azurecontainerapps.io`. Make a request to `<your container app url>/todos/1` and you should get back some JSON as you did before when running the service locally. Congrats! You have successfully deployed a .NET 10 Web API to an Azure Container App!
+
+#### Sources
+[Deploy to Azure Container Apps with Github Actions](https://learn.microsoft.com/en-us/azure/container-apps/github-actions)
+[ACA Core Components Overview](https://azure.github.io/aca-dotnet-workshop/aca/00-workshop-intro/1-aca-core-components/)
+[Configure a GitHub Action to create a container instance](https://learn.microsoft.com/en-us/azure/container-instances/container-instances-github-action#configure-github-workflow)

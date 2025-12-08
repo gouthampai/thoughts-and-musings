@@ -387,9 +387,13 @@ article img {
         @apply mb-4 sm:mb-0 sm:pb-0;
       }
 
+      & + aside.character-dialogue.align-left {
+        @apply sm:mr-0 md:mr-40;
+      }
+
       & + aside.character-dialogue:nth-of-type(even):not(.align-left),
       &.align-right {
-        @apply flex-row-reverse;
+        @apply flex-row-reverse sm:ml-0 md:ml-40;
 
         .character-dialogue-content:after {
           @apply -right-3 -rotate-90;
