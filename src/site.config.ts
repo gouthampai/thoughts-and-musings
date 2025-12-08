@@ -181,8 +181,8 @@ const config: SiteConfig = {
     owl: '/owl.webp',
     unicorn: '/unicorn.webp',
     duck: '/duck.webp',
-    github: '/github.webp',
-    azure: '/azure.webp'
+    github: 'thoughts-and-musings/github.webp',
+    azure: 'thoughts-and-musings/azure.webp'
   },
 }
 
