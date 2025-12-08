@@ -190,7 +190,7 @@ Next, navigate to your repository and go to Settings
     - AZURE_CONTAINER_APP_NAME - the name of the container app you created earlier
     - AZURE_RESOURCE_GROUP - the name of the resource group your container app belongs to
     
-4. Right now, we will also add a few secrets
+4. Let's also add a few secrets
     - AZURE_CLIENT_ID - the client id you copied down before
     - AZURE_SUBSCRIPTION_ID - the subscription id of your azure subscription
     - AZURE_TENANT_ID - the tenant id you copied down before while creating the app registration
@@ -201,5 +201,7 @@ Assuming you have set everything up correctly, you should be able to kick off a 
 
 #### Sources
 [Deploy to Azure Container Apps with Github Actions](https://learn.microsoft.com/en-us/azure/container-apps/github-actions)
+
 [ACA Core Components Overview](https://azure.github.io/aca-dotnet-workshop/aca/00-workshop-intro/1-aca-core-components/)
+
 [Configure a GitHub Action to create a container instance](https://learn.microsoft.com/en-us/azure/container-instances/container-instances-github-action#configure-github-workflow)
