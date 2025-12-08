@@ -402,7 +402,7 @@ article img {
       }
 
       img.character-dialogue-image {
-        @apply m-0 border-none shrink-1 w-20 sm:w-25;
+        @apply m-0 border-none shrink-1 rounded-full w-10;
       }
 
       .character-dialogue-content {
