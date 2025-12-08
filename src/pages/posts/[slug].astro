@@ -9,7 +9,7 @@ import PostAddendum from '~/components/PostAddendum.astro'
 import TableOfContents from '~/components/TableOfContents.astro'
 import { Image } from 'astro:assets'
 import GiscusLoader from '~/components/GiscusLoader.astro'
-import siteConfig, { base } from '~/site.config'
+import siteConfig from '~/site.config'
 import Tags from '~/components/Tags.astro'
 import PostInfo from '~/components/PostInfo.astro'
 import ScrollUpButton from '~/components/ScrollUpButton.astro'
@@ -110,7 +110,7 @@ if (postData.tags && postData.tags.length > 0) {
   {
     nextPostInSeries && (
       <a
-        href={`${base}/posts/${nextPostInSeries.id}`}
+        href={`/posts/${nextPostInSeries.id}`}
         class="button justify-center -mt-8 mb-8 !whitespace-normal text-center flex gap-2 sm:gap-3 items-center"
       >
         <span>Next: {nextPostInSeries.data.title}</span>

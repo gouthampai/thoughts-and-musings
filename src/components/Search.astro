@@ -2,12 +2,11 @@
 import '@pagefind/default-ui/css/ui.css'
 import IconCircleX from '~/icons/circle-x.svg'
 import IconSearch from '~/icons/search.svg'
-import { base } from '~/site.config'
 
 const { trailingSlashes = false } = Astro.props
 ---
 
-<site-search class="ms-auto" id="search" data-trailing-slashes={trailingSlashes} data-base-url={base}>
+<site-search class="ms-auto" id="search" data-trailing-slashes={trailingSlashes}>
   <button
     class="hover:text-accent flex cursor-pointer items-center justify-center rounded-md"
     aria-keyshortcuts="Control+K Meta+K"
