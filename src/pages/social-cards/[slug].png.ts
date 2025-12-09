@@ -17,14 +17,14 @@ const fontData = fs.readFileSync(fontPath) // Reads the file as a Buffer
 const avatarPath = path.resolve(siteConfig.socialCardAvatarImage)
 let avatarData: Buffer | undefined
 let avatarBase64: string | undefined
-if (
-  fs.existsSync(avatarPath) &&
-  (path.extname(avatarPath).toLowerCase() === '.jpg' ||
-    path.extname(avatarPath).toLowerCase() === '.jpeg')
-) {
-  avatarData = fs.readFileSync(avatarPath)
-  avatarBase64 = `data:image/jpeg;base64,${avatarData.toString('base64')}`
-}
+// if (
+//   fs.existsSync(avatarPath) &&
+//   (path.extname(avatarPath).toLowerCase() === '.jpg' ||
+//     path.extname(avatarPath).toLowerCase() === '.jpeg')
+// ) {
+//   avatarData = fs.readFileSync(avatarPath)
+//   avatarBase64 = `data:image/jpeg;base64,${avatarData.toString('base64')}`
+// }
 
 const defaultTheme =
   siteConfig.themes.default === 'auto'
