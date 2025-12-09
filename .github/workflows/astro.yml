@@ -64,6 +64,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-astro-${{ hashFiles('**/package-lock.json') }}-
             ${{ runner.os }}-astro-
+      - name: Cache social cards
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.BUILD_PATH }}/dist/og
+          key: ${{ runner.os }}-social-cards-${{ hashFiles('src/content/**/*.md', 'src/content/**/*.mdx', 'src/pages/social-cards/[slug].png.ts') }}
+          restore-keys: |
+            ${{ runner.os }}-social-cards-
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5

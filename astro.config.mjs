@@ -61,6 +61,13 @@ export default defineConfig({
     responsiveStyles: true,
   },
   vite: {
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: undefined
+        }
+      }
+    },
     plugins: [tailwindcss()],
   },
   integrations: [
